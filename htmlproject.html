@@ -1,0 +1,849 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AttendAlert | Smart Attendance</title>
+<style>
+:root {
+  --navy:#14213d;
+  --blue:#4263eb;
+  --bg:#f4f7fb;
+  --ink:#182230;
+  --muted:#718096;
+  --line:#e7ecf3;
+  --green:#15966b;
+  --amber:#d99016;
+  --red:#d94b55;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  font:14px Inter,Segoe UI,Arial,sans-serif;
+  color:var(--ink);
+}
+.layout {display:flex;min-height:100vh}
+.side {
+  width:245px;
+  background:#111c34;
+  color:#dce5f5;
+  padding:25px 16px;
+  flex-shrink:0;
+}
+.brand {
+  font-size:21px;
+  font-weight:800;
+  padding:0 12px 28px;
+}
+.brand span {color:#7f9cff}
+.brand small {
+  display:block;
+  font-size:10px;
+  color:#8da0c0;
+  font-weight:500;
+  letter-spacing:2px;
+  margin-top:5px;
+}
+.navlabel {
+  font-size:10px;
+  color:#8090ad;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  padding:14px 12px 8px;
+}
+.nav button {
+  width:100%;
+  text-align:left;
+  background:none;
+  border:0;
+  color:#b9c6dc;
+  padding:12px;
+  border-radius:9px;
+  margin:2px 0;
+  cursor:pointer;
+  font-size:14px;
+}
+.nav button.active,.nav button:hover {
+  background:#263758;
+  color:white;
+}
+.main {flex:1;min-width:0}
+.top {
+  height:70px;
+  background:white;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+}
+.top strong {font-size:16px}
+.profile {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--muted);
+}
+.avatar {
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#e8edff;
+  color:var(--blue);
+  display:grid;
+  place-items:center;
+  font-weight:800;
+}
+.content {
+  padding:28px 30px;
+  max-width:1450px;
+  margin:auto;
+}
+.welcome {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:22px;
+}
+.welcome h1 {margin:0 0 6px;font-size:25px}
+.muted {color:var(--muted)}
+.btn {
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  background:var(--blue);
+  color:white;
+  font-weight:650;
+  cursor:pointer;
+}
+.btn.secondary {background:#edf1ff;color:#3454cf}
+.btn.dark {background:var(--navy)}
+.btn.small {padding:7px 10px;font-size:12px}
+.cards {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:15px;
+  margin-bottom:20px;
+}
+.card,.panel {
+  background:white;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:18px;
+  box-shadow:0 2px 8px #18223008;
+}
+.stathead {
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:12px;
+}
+.stat {font-size:29px;font-weight:800;margin:13px 0 4px}
+.statnote {font-size:11px;color:var(--muted)}
+.green {color:var(--green)}
+.amber {color:var(--amber)}
+.red {color:var(--red)}
+.grid2 {
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:16px;
+}
+.panel {margin-bottom:17px}
+.panelhead {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+.panel h3 {font-size:15px;margin:0}
+.tablewrap {overflow:auto}
+table {width:100%;border-collapse:collapse;white-space:nowrap}
+th {
+  text-align:left;
+  color:#8290a4;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+  padding:11px 9px;
+  border-bottom:1px solid var(--line);
+}
+td {
+  padding:12px 9px;
+  border-bottom:1px solid #f0f2f6;
+  font-size:13px;
+}
+tr:last-child td {border-bottom:0}
+.badge {
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:750;
+}
+.badge.safe {background:#e6f7ef;color:#13845e}
+.badge.warning {background:#fff3dd;color:#a86b08}
+.badge.critical {background:#ffeaec;color:#c13b48}
+.bar {
+  height:7px;
+  background:#edf0f5;
+  border-radius:8px;
+  overflow:hidden;
+  width:95px;
+  display:inline-block;
+  vertical-align:middle;
+  margin-right:7px;
+}
+.bar i {
+  display:block;
+  height:100%;
+  background:var(--blue);
+  border-radius:8px;
+}
+.alert {
+  padding:12px;
+  border-radius:9px;
+  background:#fff0f0;
+  border:1px solid #ffdddd;
+  margin:8px 0;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+.alert b {color:#b53d48}
+.subjectrow {
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
+.subjectrow:last-child {border:0}
+.field {
+  padding:9px 11px;
+  border:1px solid #dce3ee;
+  border-radius:8px;
+  background:white;
+  color:var(--ink);
+}
+.filters {display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.hidden {display:none!important}
+.formrow {display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.notice {
+  font-size:12px;
+  background:#f0f4ff;
+  color:#4057a4;
+  padding:11px 13px;
+  border-radius:8px;
+  margin:12px 0;
+}
+.empty {text-align:center;padding:25px;color:var(--muted)}
+@media(max-width:900px) {
+  .side {width:195px}
+  .cards {grid-template-columns:repeat(2,1fr)}
+  .grid2 {grid-template-columns:1fr}
+  .content {padding:20px}
+}
+@media(max-width:620px) {
+  .layout {display:block}
+  .side {width:100%;padding:13px}
+  .brand {padding:0 8px 10px}
+  .nav {display:flex;overflow:auto}
+  .navlabel {display:none}
+  .nav button {white-space:nowrap;width:auto;padding:9px}
+  .top {height:55px;padding:0 16px}
+  .content {padding:17px}
+  .cards {gap:9px}
+  .card {padding:13px}
+  .stat {font-size:23px}
+  .welcome {align-items:flex-start;flex-direction:column}
+  .welcome h1 {font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+  <div class="brand">◈ Attend<span>Alert</span>
+    <small>SMART ATTENDANCE SYSTEM</small>
+  </div>
+  <div class="navlabel">Workspace</div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard">▦ Dashboard</button>
+    <button data-page="attendance">✓ Mark Attendance</button>
+    <button data-page="students">♙ Students & Roster</button>
+    <button data-page="alerts">⚑ Risk Alerts</button>
+    <button data-page="recovery">↗ Recovery Calculator</button>
+    <button data-page="student">▤ Student Portal</button>
+    <button data-page="reports">▥ Reports & Export</button>
+  </nav>
+  <div class="navlabel">Account</div>
+  <button class="btn dark" style="width:100%;margin-top:10px" onclick="resetDemo()">↻ Reset demo data</button>
+</aside>
+
+<main class="main">
+<header class="top">
+  <strong id="topTitle">Overview</strong>
+  <div class="profile">
+    <span>Mentor Workspace</span>
+    <div class="avatar">M</div>
+  </div>
+</header>
+
+<div class="content">
+<section id="dashboard" class="page">
+  <div class="welcome">
+    <div>
+      <h1>Good morning, Mentor 👋</h1>
+      <div class="muted">Here is your attendance overview and early-warning summary.</div>
+    </div>
+    <button class="btn" onclick="showPage('attendance')">＋ Take attendance</button>
+  </div>
+  <div class="cards" id="stats"></div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="panelhead">
+        <h3>Students needing attention</h3>
+        <button class="btn secondary small" onclick="showPage('alerts')">View all</button>
+      </div>
+      <div id="dashAlerts"></div>
+    </div>
+    <div class="panel">
+      <div class="panelhead">
+        <h3>Subject attendance</h3>
+        <span class="muted">Class average</span>
+      </div>
+      <div id="subjectSummary"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panelhead">
+      <h3>Attendance roster</h3>
+      <button class="btn secondary small" onclick="showPage('students')">Open roster</button>
+    </div>
+    <div class="tablewrap" id="dashTable"></div>
+  </div>
+</section>
+
+<section id="attendance" class="page hidden">
+  <div class="welcome">
+    <div>
+      <h1>Mark daily attendance</h1>
+      <div class="muted">Mark everyone present, then change individual records where needed.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="filters">
+      <select id="attSubject" class="field"></select>
+      <input type="date" id="attDate" class="field">
+      <button class="btn secondary" onclick="markAll('Present')">Mark all present</button>
+      <button class="btn" onclick="saveAttendance()">Save attendance</button>
+    </div>
+    <div class="notice">Late is counted as attended. Absent records reduce the attendance percentage.</div>
+    <div id="attTable" class="tablewrap"></div>
+  </div>
+</section>
+
+<section id="students" class="page hidden">
+  <div class="welcome">
+    <div>
+      <h1>Students & roster</h1>
+      <div class="muted">Search students and review their overall attendance status.</div>
+    </div>
+    <button class="btn" onclick="addStudent()">＋ Add student</button>
+  </div>
+  <div class="panel">
+    <div class="filters">
+      <input id="studentSearch" class="field" placeholder="Search name or roll number..." oninput="renderStudents()">
+      <select id="studentRisk" class="field" onchange="renderStudents()">
+        <option value="All">All risk levels</option>
+        <option>Safe</option>
+        <option>Warning</option>
+        <option>Critical</option>
+      </select>
+    </div>
+    <div id="studentTable" class="tablewrap"></div>
+  </div>
+</section>
+
+<section id="alerts" class="page hidden">
+  <div class="welcome">
+    <div>
+      <h1>Mentor notification hub</h1>
+      <div class="muted">Prioritized list of students who may need intervention.</div>
+    </div>
+    <button class="btn secondary" onclick="simulateAlerts()">Simulate critical alerts</button>
+  </div>
+  <div class="panel"><div id="alertList"></div></div>
+</section>
+
+<section id="recovery" class="page hidden">
+  <div class="welcome">
+    <div>
+      <h1>Condonation & recovery estimator</h1>
+      <div class="muted">Calculate how many consecutive classes are needed to reach 75%.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="formrow">
+      <select id="recStudent" class="field" onchange="calcRecovery()"></select>
+      <select id="recSubject" class="field" onchange="calcRecovery()"></select>
+    </div>
+    <div id="recoveryResult" style="margin-top:20px"></div>
+  </div>
+</section>
+
+<section id="student" class="page hidden">
+  <div class="welcome">
+    <div>
+      <h1>Student self-service portal</h1>
+      <div class="muted">Private-style view of one student's own attendance summary.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="filters">
+      <select id="portalStudent" class="field" onchange="renderPortal()"></select>
+    </div>
+    <div id="portalContent"></div>
+  </div>
+</section>
+
+<section id="reports" class="page hidden">
+  <div class="welcome">
+    <div>
+      <h1>Reports & data export</h1>
+      <div class="muted">Download a CSV attendance summary for your records.</div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Attendance summary export</h3>
+    <p class="muted">Exports student, subject, classes held, classes attended, percentage and risk tier.</p>
+    <button class="btn" onclick="exportCSV()">↓ Download CSV report</button>
+    <div class="notice">Demo data is stored in this browser using local storage. Export a CSV to keep a copy.</div>
+  </div>
+</section>
+</div>
+</main>
+</div>
+
+<script>
+const subjects = [
+  'Mathematics',
+  'Data Structures',
+  'Database Systems',
+  'Computer Networks',
+  'Web Development'
+];
+
+const initial = [
+  ['Rahul Verma','23A91A0001',[12,9,14,11,13]],
+  ['Priya Sharma','23A91A0002',[18,19,17,18,19]],
+  ['Arjun Reddy','23A91A0003',[15,14,16,15,14]],
+  ['Sneha Rao','23A91A0004',[13,12,14,13,12]],
+  ['Kiran Kumar','23A91A0005',[10,11,9,10,12]],
+  ['Ananya Das','23A91A0006',[19,18,19,20,18]],
+  ['Vikram Singh','23A91A0007',[8,10,9,11,8]],
+  ['Meera Patel','23A91A0008',[16,17,15,16,17]],
+  ['Sai Teja','23A91A0009',[14,13,14,15,13]],
+  ['Divya Nair','23A91A0010',[20,19,18,19,20]],
+  ['Rohit Jain','23A91A0011',[11,12,10,12,11]],
+  ['Pooja Reddy','23A91A0012',[17,16,18,17,16]]
+];
+
+let students = JSON.parse(
+  localStorage.getItem('attendalert_students') || 'null'
+);
+
+if (!students) {
+  students = initial.map(x => ({
+    name:x[0],
+    roll:x[1],
+    held:20,
+    att:x[2],
+    status:Array(5).fill('Present'),
+    notes:[]
+  }));
+}
+
+function persist() {
+  localStorage.setItem(
+    'attendalert_students',
+    JSON.stringify(students)
+  );
+}
+
+function pct(s,i) {
+  return s.held ? Math.round(s.att[i]/s.held*100) : 0;
+}
+
+function risk(p) {
+  return p>=75 ? 'Safe' : p>=65 ? 'Warning' : 'Critical';
+}
+
+function avg(s) {
+  return Math.round(
+    s.att.reduce((a,b)=>a+b,0)/(s.held*5)*100
+  );
+}
+
+function badge(r) {
+  return `<span class="badge ${r.toLowerCase()}">${r}</span>`;
+}
+
+function bar(p) {
+  return `<span class="bar"><i style="width:${Math.min(100,p)}%"></i></span>${p}%`;
+}
+
+function table(rows) {
+  return `
+  <table>
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Roll number</th>
+        <th>Overall</th>
+        <th>Risk level</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(s=>`
+        <tr>
+          <td><b>${s.name}</b></td>
+          <td>${s.roll}</td>
+          <td>${bar(avg(s))}</td>
+          <td>${badge(risk(avg(s)))}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+}
+
+function render() {
+  renderDashboard();
+  renderStudents();
+  renderAttendance();
+  renderAlerts();
+  fillSelectors();
+  renderPortal();
+}
+
+function renderDashboard() {
+  let safe=students.filter(s=>risk(avg(s))==='Safe').length;
+  let warn=students.filter(s=>risk(avg(s))==='Warning').length;
+  let crit=students.length-safe-warn;
+
+  document.getElementById('stats').innerHTML=[
+    ['Total students',students.length,'Active roster'],
+    ['Safe students',safe,'75% and above'],
+    ['Warning',warn,'65% – 74%'],
+    ['Critical shortage',crit,'Below 65%']
+  ].map((x,i)=>`
+    <div class="card">
+      <div class="stathead">${x[0]}</div>
+      <div class="stat">${x[1]}</div>
+      <div class="statnote">${x[2]}</div>
+    </div>
+  `).join('');
+
+  let at=students
+    .filter(s=>risk(avg(s))!=='Safe')
+    .sort((a,b)=>avg(a)-avg(b))
+    .slice(0,5);
+
+  document.getElementById('dashAlerts').innerHTML=at.length
+    ? at.map(s=>`
+      <div class="alert">
+        <span>
+          <b>${s.name}</b><br>
+          <small class="muted">${s.roll} · ${avg(s)}% attendance</small>
+        </span>
+        ${badge(risk(avg(s)))}
+      </div>
+    `).join('')
+    : '<div class="empty">No students currently at risk.</div>';
+
+  document.getElementById('subjectSummary').innerHTML=
+    subjects.map((sub,i)=>{
+      let p=Math.round(
+        students.reduce((a,s)=>a+pct(s,i),0)/students.length
+      );
+      return `<div class="subjectrow"><span>${sub}</span><b>${p}%</b></div>`;
+    }).join('');
+
+  document.getElementById('dashTable').innerHTML=
+    table(students.slice(0,6));
+}
+
+function renderStudents() {
+  let q=(document.getElementById('studentSearch')?.value||'').toLowerCase();
+  let r=document.getElementById('studentRisk')?.value||'All';
+
+  let list=students.filter(s=>
+    (s.name.toLowerCase().includes(q)||s.roll.toLowerCase().includes(q)) &&
+    (r==='All'||risk(avg(s))===r)
+  );
+
+  document.getElementById('studentTable').innerHTML=table(list);
+}
+
+function renderAttendance() {
+  let sub=document.getElementById('attSubject')?.value||subjects[0];
+  let idx=subjects.indexOf(sub);
+
+  document.getElementById('attTable').innerHTML=`
+  <table>
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Roll number</th>
+        <th>Current %</th>
+        <th>Today's status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${students.map((s,i)=>`
+        <tr>
+          <td><b>${s.name}</b></td>
+          <td>${s.roll}</td>
+          <td>${pct(s,idx)}%</td>
+          <td>
+            <select class="field" id="status${i}">
+              <option ${s.status[idx]==='Present'?'selected':''}>Present</option>
+              <option ${s.status[idx]==='Absent'?'selected':''}>Absent</option>
+              <option ${s.status[idx]==='Late'?'selected':''}>Late</option>
+            </select>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+}
+
+function markAll(v) {
+  students.forEach((s,i)=>{
+    let e=document.getElementById('status'+i);
+    if(e) e.value=v;
+  });
+}
+
+function saveAttendance() {
+  let idx=subjects.indexOf(document.getElementById('attSubject').value);
+
+  students.forEach((s,i)=>{
+    let v=document.getElementById('status'+i)?.value||'Present';
+    s.held++;
+    if(v!=='Absent') s.att[idx]++;
+    s.status[idx]=v;
+  });
+
+  persist();
+  render();
+  alert('Attendance saved successfully. Percentages and risk levels updated.');
+}
+
+function renderAlerts() {
+  let at=students
+    .filter(s=>risk(avg(s))!=='Safe')
+    .sort((a,b)=>avg(a)-avg(b));
+
+  document.getElementById('alertList').innerHTML=at.length
+    ? at.map(s=>`
+      <div class="alert">
+        <span>
+          <b>${s.name}</b> — ${avg(s)}% overall<br>
+          <small class="muted">${s.roll} · ${risk(avg(s))} · Mentor follow-up recommended</small><br>
+          <button class="btn secondary small" style="margin-top:8px"
+            onclick="logIntervention('${s.roll}')">
+            Log mentoring intervention
+          </button>
+        </span>
+        ${badge(risk(avg(s)))}
+      </div>
+    `).join('')
+    : '<div class="empty">Great! No at-risk students.</div>';
+}
+
+function logIntervention(roll) {
+  let s=students.find(x=>x.roll===roll);
+  let note=prompt('Enter mentoring / counseling note for '+s.name+':');
+
+  if(note) {
+    s.notes.push({date:new Date().toLocaleDateString(),note});
+    persist();
+    alert('Mentoring intervention recorded.');
+  }
+}
+
+function simulateAlerts() {
+  let n=students.filter(s=>risk(avg(s))==='Critical').length;
+  alert(n+' critical student(s) found. Simulated warning notifications generated. No real emails are sent.');
+}
+
+function fillSelectors() {
+  let opts=students.map((s,i)=>
+    `<option value="${i}">${s.name} (${s.roll})</option>`
+  ).join('');
+
+  ['recStudent','portalStudent'].forEach(id=>{
+    let el=document.getElementById(id);
+    if(el&&!el.options.length) el.innerHTML=opts;
+  });
+
+  let rs=document.getElementById('recSubject');
+  if(rs&&!rs.options.length) {
+    rs.innerHTML=subjects.map(x=>`<option>${x}</option>`).join('');
+  }
+}
+
+function calcRecovery() {
+  let s=students[+document.getElementById('recStudent').value];
+  let i=subjects.indexOf(document.getElementById('recSubject').value);
+  let p=pct(s,i);
+
+  let needed=Math.max(
+    0,
+    Math.ceil((.75*s.held-s.att[i])/.25)
+  );
+
+  document.getElementById('recoveryResult').innerHTML=`
+    <div class="cards">
+      <div class="card">
+        <div class="stathead">Current attendance</div>
+        <div class="stat">${p}%</div>
+      </div>
+      <div class="card">
+        <div class="stathead">Classes attended</div>
+        <div class="stat">${s.att[i]} / ${s.held}</div>
+      </div>
+      <div class="card">
+        <div class="stathead">Consecutive classes needed</div>
+        <div class="stat amber">${needed}</div>
+      </div>
+      <div class="card">
+        <div class="stathead">Eligibility target</div>
+        <div class="stat">75%</div>
+      </div>
+    </div>
+    <div class="notice">
+      ${needed===0
+        ? 'This student is currently meeting the 75% threshold.'
+        : 'If '+s.name+' attends the next '+needed+' consecutive '+document.getElementById('recSubject').value+' classes, attendance will reach at least 75%.'}
+    </div>`;
+}
+
+function renderPortal() {
+  let el=document.getElementById('portalStudent');
+  if(!el||!el.options.length) return;
+
+  let s=students[+el.value]||students[0];
+
+  document.getElementById('portalContent').innerHTML=`
+    <h2>${s.name}</h2>
+    <p class="muted">${s.roll}</p>
+    <div class="cards">
+      <div class="card">
+        <div class="stathead">Overall attendance</div>
+        <div class="stat">${avg(s)}%</div>
+        ${badge(risk(avg(s)))}
+      </div>
+      <div class="card">
+        <div class="stathead">Subjects tracked</div>
+        <div class="stat">5</div>
+      </div>
+    </div>
+    ${subjects.map((sub,i)=>`
+      <div class="subjectrow">
+        <span>${sub}</span>
+        <span>${bar(pct(s,i))} ${badge(risk(pct(s,i)))}</span>
+      </div>
+    `).join('')}`;
+}
+
+function exportCSV() {
+  let lines=[[
+    'Name','Roll Number','Subject','Classes Held',
+    'Classes Attended','Attendance %','Risk'
+  ]];
+
+  students.forEach(s=>{
+    subjects.forEach((sub,i)=>{
+      lines.push([
+        s.name,s.roll,sub,s.held,s.att[i],pct(s,i),risk(pct(s,i))
+      ]);
+    });
+  });
+
+  let csv=lines.map(r=>
+    r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')
+  ).join('\n');
+
+  let a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='attendalert-report.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function addStudent() {
+  let name=prompt('Student full name:');
+  if(!name) return;
+
+  let roll=prompt('Roll number:');
+  if(!roll) return;
+
+  if(students.some(s=>s.roll===roll)) {
+    alert('Roll number already exists');
+    return;
+  }
+
+  students.push({
+    name,roll,held:0,
+    att:[0,0,0,0,0],
+    status:Array(5).fill('Present'),
+    notes:[]
+  });
+
+  persist();
+  render();
+}
+
+function resetDemo() {
+  if(confirm('Reset all demo attendance data?')) {
+    localStorage.removeItem('attendalert_students');
+    location.reload();
+  }
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>
+    p.classList.toggle('hidden',p.id!==id)
+  );
+
+  document.querySelectorAll('.nav button[data-page]').forEach(b=>
+    b.classList.toggle('active',b.dataset.page===id)
+  );
+
+  document.getElementById('topTitle').textContent=
+    document.querySelector(`button[data-page="${id}"]`)
+    .textContent.trim().replace(/^[^\w]+/,'');
+}
+
+document.querySelectorAll('.nav button[data-page]').forEach(b=>
+  b.addEventListener('click',()=>showPage(b.dataset.page))
+);
+
+document.getElementById('attSubject').innerHTML=
+  subjects.map(x=>`<option>${x}</option>`).join('');
+
+document.getElementById('attDate').value=
+  new Date().toISOString().slice(0,10);
+
+document.getElementById('attSubject')
+  .addEventListener('change',renderAttendance);
+
+render();
+</script>
+</body>
+</html>
